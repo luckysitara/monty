@@ -1,29 +1,55 @@
 #include "monty.h"
+#include "main.h"
 
 /**
- * pchar - prints the corresponding char of the element at the top of a stack
- * @stack: element at the top of the stack (head)
- * @line_number: line number of the command in the file .m
- *
- * Return: void
+ * pchar_handler - handles the pchar instruction
+ * @stack: double pointer to the stack to push to
+ * @line_number: number of the line in the file
  */
-void pchar(stack_t **stack, unsigned int line_number)
+void pchar_handler(stack_t **stack, unsigned int line_number)
 {
-	if (*stack == NULL)
+	stack_t *node = *stack;
+
+	if (!node)
 	{
-		fprintf(stderr, "L%u: can't pchar, stack empty\n", line_number);
-		error_signal = 1;
+		dprintf(STDERR_FILENO, PCHAR_FAIL, line_number);
+		free_all(1);
+		exit(EXIT_FAILURE);
 	}
-	else
+
+	if (node->n < 0 || node->n > 127)
 	{
-		if ((*stack)->n <= 0 || (*stack)->n >= 127)
-		{
-			fprintf(stderr, "L%u: can't pchar, value out of range\n", line_number);
-			error_signal = 1;
-		}
-		else
-		{
-			printf("%c\n", (char)(*stack)->n);
-		}
+		dprintf(STDERR_FILENO, PCHAR_RANGE, line_number);
+		free_all(1);
+		exit(EXIT_FAILURE);
 	}
+
+	putchar(node->n);
+	putchar('\n');
+}
+
+/**
+ * pstr_handler - handles the pstr instruction
+ * @stack: double pointer to the stack to push to
+ * @line_number: number of the line in the file
+ */
+void pstr_handler(stack_t **stack, unsigned int line_number)
+{
+	stack_t *node = *stack;
+
+	(void)line_number;
+
+	if (!node)
+	{
+		putchar('\n');
+		return;
+	}
+
+	while (node && node->n != 0 && node->n >= 0 && node->n <= 127)
+	{
+		putchar(node->n);
+		node = node->next;
+	}
+
+	putchar('\n');
 }
